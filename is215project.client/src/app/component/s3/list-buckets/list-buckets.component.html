@@ -1,0 +1,5 @@
+<div>Bucket List</div>
+
+<ng-template ngFor let-b [ngForOf]="buckets">
+  {{ b.bucketName }} - {{ b.creationDate | date: 'fullDate' }}
+</ng-template>
