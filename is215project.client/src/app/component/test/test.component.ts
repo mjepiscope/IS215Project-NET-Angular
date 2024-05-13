@@ -10,13 +10,18 @@ export class TestComponent {
   result!: boolean;
 
   constructor(service: AwsService) {
+
     service.testConnection().subscribe({
-      next: (result) => this.result = result
+
+      next: (r) => this.result = r
+
       , error: (e) => {
         this.result = false;
         console.log(e);
       }
+
     });
+
   }
 
 }

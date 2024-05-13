@@ -23,9 +23,30 @@ namespace IS215Project.Server.Controllers
 
             return response.Buckets;
         }
-        
+
         //[HttpGet]
         //public Task<ListBucketsResponse> GetList()
         //    => _client.ListBucketsAsync();
+
+        [HttpPost]
+        public void GenerateContentFromImage()
+        {
+            UploadImageToS3();
+
+            GetResponseFromLambda();
+        }
+
+
+        private void UploadImageToS3()
+        {
+            // TODO
+            // 1. Call S3 to Upload Image
+        }
+
+        private void GetResponseFromLambda()
+        {
+            // TODO
+            // 2. Return Lambda Response
+        }
     }
 }
