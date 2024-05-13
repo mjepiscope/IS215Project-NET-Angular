@@ -1,22 +1,48 @@
-﻿:host {
-    max-width: 1280px;
-    padding: 2rem;
-    text-align: center;
+div.page {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
 }
 
-tr:nth-child(even) {
-    background: #F2F2F2;
+div.page-title {
+  text-align: center;
 }
 
-tr:nth-child(odd) {
-    background: #FFF;
+div.page-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
 }
 
-th, td {
-    padding-left: 1rem;
-    padding-right: 1rem;
+div.upload, div.article {
+  flex-grow: 1;
 }
 
-table {
-    margin: 0 auto;
+label.custom-file-upload {
+  align-items: center;
+  border: 2px dashed #ddd;
+  border-radius: 10px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  transition: border-color 0.3s ease;
+  width: 100%;
+}
+
+label.custom-file-upload:hover {
+  border-color: #aaa;
+}
+
+label.custom-file-upload input[type="file"] {
+  display: none;
+}
+
+div.article-title {
+  font-size: 32px;
+  font-weight: bold;
 }
