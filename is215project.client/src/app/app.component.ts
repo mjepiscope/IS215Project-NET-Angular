@@ -8,21 +8,23 @@ import { AwsService } from './services/aws.service';
 })
 export class AppComponent {
 
+  file!: File;
   imageSrc!: string;
   article: string = "Generated text here...";
 
   constructor(private service: AwsService) { }
 
-  onImageChange(event: any) {
+  onImageChange(e: any) {
 
-    if (event.target.files && event.target.files[0]) {
-      this.imageSrc = URL.createObjectURL(event.target.files[0]);
+    if (!e || !e.target || !e.target.files) {
+      //TODO Show Error
+      return;
     }
 
-    //TODO read image content here (check correct data type)
-    let testImage = "";
+    this.file = e.target.files[0];
+    this.imageSrc = URL.createObjectURL(this.file);
 
-    this.service.generateContentFromImage(testImage).subscribe({
+    this.service.generateContentFromImage(this.file).subscribe({
 
       next: (a: string) => {
         this.article = a;

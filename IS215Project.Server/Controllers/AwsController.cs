@@ -1,5 +1,6 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
+using Amazon.S3.Transfer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IS215Project.Server.Controllers
@@ -8,39 +9,44 @@ namespace IS215Project.Server.Controllers
     [Route("api/[controller]/[action]")]
     public class AwsController : ControllerBase
     {
-        private IAmazonS3 _client;
-        //private readonly IAmazonS3 _client = new AmazonS3Client();
+        //private IAmazonS3 _client;
+        private readonly IAmazonS3 _client = new AmazonS3Client();
 
         [HttpGet]
         public bool TestConnection() => true;
 
         [HttpGet]
-        public async Task<List<S3Bucket>> GetBuckets()
+        public async Task<List<S3Bucket>> GetBucketsAsync()
         {
-            _client = new AmazonS3Client();
-            
             var response = await _client.ListBucketsAsync();
 
             return response.Buckets;
         }
 
-        //[HttpGet]
-        //public Task<ListBucketsResponse> GetList()
-        //    => _client.ListBucketsAsync();
-
         [HttpPost]
-        public void GenerateContentFromImage()
+        public async Task<IActionResult> GenerateContentFromImageAsync([FromForm] IFormFile file)
         {
-            UploadImageToS3();
+            await UploadImageToS3(file);
 
             GetResponseFromLambda();
+
+            return new JsonResult("Lorem Ipsum ...");
         }
 
-
-        private void UploadImageToS3()
+        private async Task UploadImageToS3(IFormFile file)
         {
-            // TODO
             // 1. Call S3 to Upload Image
+            var transfer = new TransferUtility(_client);
+
+            await using var stream = file.OpenReadStream();
+            
+            // TODO get bucket name from config?
+            // TODO make filename unique
+            await transfer.UploadAsync(
+                stream,
+                "is215-project-group2",
+                file.FileName
+            );
         }
 
         private void GetResponseFromLambda()
