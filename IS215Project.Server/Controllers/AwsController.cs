@@ -9,7 +9,6 @@ namespace IS215Project.Server.Controllers
     [Route("api/[controller]/[action]")]
     public class AwsController : ControllerBase
     {
-        //private IAmazonS3 _client;
         private readonly IAmazonS3 _client = new AmazonS3Client();
 
         [HttpGet]
@@ -39,13 +38,12 @@ namespace IS215Project.Server.Controllers
             var transfer = new TransferUtility(_client);
 
             await using var stream = file.OpenReadStream();
-            
+
             // TODO get bucket name from config?
-            // TODO make filename unique
             await transfer.UploadAsync(
                 stream,
                 "is215-project-group2",
-                file.FileName
+                GetFilenameWithTimestamp(file.FileName)
             );
         }
 
@@ -53,6 +51,15 @@ namespace IS215Project.Server.Controllers
         {
             // TODO
             // 2. Return Lambda Response
+        }
+
+        private string GetFilenameWithTimestamp(string filename)
+        {
+            // Make filename unique
+            var baseName = Path.GetFileNameWithoutExtension(filename);
+            var ext = Path.GetExtension(filename);
+
+            return $"{baseName}.{DateTime.UtcNow:yyyyMMddHHmmss}{ext}";
         }
     }
 }
