@@ -18,6 +18,7 @@ div.page-content {
 
 div.upload, div.article {
   flex-grow: 1;
+  min-width: 400px;
 }
 
 label.custom-file-upload {
@@ -40,6 +41,10 @@ label.custom-file-upload:hover {
 
 label.custom-file-upload input[type="file"] {
   display: none;
+}
+
+img#preview-image {
+  max-width: 100%;
 }
 
 div.article-title {

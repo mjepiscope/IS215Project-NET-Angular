@@ -14,9 +14,14 @@
     <div class="upload">
 
       <label for="upload-image" class="custom-file-upload">
-        <input type="file" id="upload-image" accept="image/*" style="display:none;">
+
+        <input type="file" id="upload-image" accept="image/*" (change)="onImageChange($event)">
         Upload your image here
       </label>
+
+      <div class="image-container">
+        <img id="preview-image" alt="" [src]="imageSrc">
+      </div>
 
     </div>
 
