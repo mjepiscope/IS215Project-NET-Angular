@@ -7,7 +7,7 @@ namespace IS215Project.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class AwsController : ControllerBase
+    public class AwsController(IConfiguration config) : ControllerBase
     {
         private readonly IAmazonS3 _client = new AmazonS3Client();
 
@@ -39,10 +39,9 @@ namespace IS215Project.Server.Controllers
 
             await using var stream = file.OpenReadStream();
 
-            // TODO get bucket name from config?
             await transfer.UploadAsync(
                 stream,
-                "is215-project-group2",
+                GetBucketName(),
                 GetFilenameWithTimestamp(file.FileName)
             );
         }
@@ -51,6 +50,17 @@ namespace IS215Project.Server.Controllers
         {
             // TODO
             // 2. Return Lambda Response
+        }
+
+        private string GetBucketName()
+        {
+            // Get bucket name from appsettings.json
+            var bucketName = config.GetValue<string>("AwsContext:S3BucketName");
+
+            if (string.IsNullOrEmpty(bucketName))
+                throw new ArgumentNullException(nameof(bucketName), "AwsContext:S3BucketName is null or invalid.");
+
+            return bucketName;
         }
 
         private string GetFilenameWithTimestamp(string filename)
