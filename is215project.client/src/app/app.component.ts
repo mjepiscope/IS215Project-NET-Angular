@@ -43,10 +43,11 @@ export class AppComponent {
           catch (e) {
             console.log(e);
             i++;
+            // Try move waiting time here before trying again
+            await this.delay(2000);
           }
-
           // wait 2 sec before trying again
-          this.delay(2000);
+          // this.delay(2000);
         }
 
       }

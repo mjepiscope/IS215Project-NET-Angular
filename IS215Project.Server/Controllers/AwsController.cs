@@ -26,11 +26,15 @@ namespace IS215Project.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> GenerateContentFromImageAsync([FromForm] IFormFile file)
         {
-            await UploadImageToS3(file);
+            var filenameWithTimestamp = await UploadImageToS3(file);
 
-            GetResponseFromLambda();
+            // Get the generated content from Output Bucket
+            // GetResponseFromLambda();
 
-            return new JsonResult("Lorem Ipsum ...");
+            var expectedFilename = GetExpectedOutputFilename(filenameWithTimestamp);
+            var content = await GetGeneratedContentAsync(expectedFilename);
+
+            return content;
         }
 
         [HttpPost]
@@ -46,6 +50,7 @@ namespace IS215Project.Server.Controllers
         {
             //var content =
             //    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque placerat nunc nec leo finibus, at porta sapien commodo. Morbi dictum ante velit, quis fringilla urna finibus nec. Ut consectetur congue purus at feugiat. Nulla sed scelerisque elit, quis sagittis massa. Aenean risus turpis, tempor at velit nec, porttitor consectetur est. Mauris sed quam in lectus tempor venenatis. Nam suscipit accumsan ipsum ut ornare. Nunc commodo dui at nisl efficitur interdum. Quisque id tellus ullamcorper, feugiat arcu in, accumsan mauris. Phasellus risus metus, venenatis fringilla velit volutpat, porta lacinia enim. Suspendisse eget lectus ac turpis feugiat lobortis. Ut pulvinar eu purus nec pharetra. Etiam turpis turpis, finibus non tellus eu, molestie consequat ipsum.";
+            await RefreshBucketAsync(GetOutputBucketName());
 
             using var response = await _client.GetObjectAsync(
                 GetOutputBucketName(),
@@ -56,6 +61,37 @@ namespace IS215Project.Server.Controllers
             var content = await reader.ReadToEndAsync();
 
             return new JsonResult(content);
+        }
+
+        // Refresh the output bucket name
+        private async Task RefreshBucketAsync(string bucketName)
+        {
+            try
+            {
+                var request = new ListObjectsV2Request
+                {
+                    BucketName = bucketName,
+                };
+
+                ListObjectsV2Response response;
+                do
+                {
+                    response = await _client.ListObjectsV2Async(request);
+                    foreach (S3Object entry in response.S3Objects)
+                    {
+                        System.Console.WriteLine($"Object key: {entry.Key}");
+                    }
+                    request.ContinuationToken = response.NextContinuationToken;
+                } while (response.IsTruncated);
+            }
+            catch (AmazonS3Exception e)
+            {
+                System.Console.WriteLine("Error encountered on server. Message:'{0}' when listing objects", e.Message);
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine("Unknown encountered on server. Message:'{0}' when listing objects", e.Message);
+            }
         }
 
         private async Task<string> UploadImageToS3(IFormFile file)
@@ -111,6 +147,13 @@ namespace IS215Project.Server.Controllers
             var ext = Path.GetExtension(filename);
 
             return $"{baseName}.{DateTime.UtcNow:yyyyMMddHHmmss}{ext}";
+        }
+
+        private string GetExpectedOutputFilename(string filenameWithTimestamp)
+        {
+            // Return expected output filename
+            var pos = filenameWithTimestamp.LastIndexOf(".");
+            return filenameWithTimestamp.Substring(0, pos < 0 ? filenameWithTimestamp.Length : pos) + ".txt";
         }
     }
 }
