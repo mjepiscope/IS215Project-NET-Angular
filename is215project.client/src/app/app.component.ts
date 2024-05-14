@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { firstValueFrom } from 'rxjs';
 import { AwsService } from './services/aws.service';
 
@@ -13,7 +14,7 @@ export class AppComponent {
   imageSrc!: string;
   article: string = "Generated text here...";
 
-  constructor(private service: AwsService) { }
+  constructor(private service: AwsService, private spinner: NgxSpinnerService) { }
 
   onImageChange(e: any) {
 
@@ -24,6 +25,8 @@ export class AppComponent {
 
     this.file = e.target.files[0];
     this.imageSrc = URL.createObjectURL(this.file);
+
+    this.spinner.show();
 
     this.service.uploadImage(this.file).subscribe({
 
@@ -50,9 +53,11 @@ export class AppComponent {
           // this.delay(2000);
         }
 
+        this.spinner.hide();
       }
 
       , error: (e) => {
+        this.spinner.hide();
         console.log(e);
       }
 
