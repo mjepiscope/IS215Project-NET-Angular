@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { AwsService } from './services/aws.service';
 
 @Component({
@@ -24,10 +25,30 @@ export class AppComponent {
     this.file = e.target.files[0];
     this.imageSrc = URL.createObjectURL(this.file);
 
-    this.service.generateContentFromImage(this.file).subscribe({
+    this.service.uploadImage(this.file).subscribe({
 
-      next: (a: string) => {
-        this.article = a;
+      next: async (filenameWithTimestamp: string) => {
+        
+        let expectedFilename = this.getExpectedFilename(filenameWithTimestamp);
+
+        let i = 0;
+
+        // 30 retries
+        while (i < 30) {
+
+          try {
+            this.article = await firstValueFrom(this.service.getGeneratedContent(expectedFilename));
+            break;
+          }
+          catch (e) {
+            console.log(e);
+            i++;
+          }
+
+          // wait 2 sec before trying again
+          this.delay(2000);
+        }
+
       }
 
       , error: (e) => {
@@ -38,4 +59,13 @@ export class AppComponent {
 
   }
 
+  getExpectedFilename(filenameWithTimestamp: string) {
+    let pos = filenameWithTimestamp.lastIndexOf(".");
+
+    return filenameWithTimestamp.substring(0, pos < 0 ? filenameWithTimestamp.length : pos) + ".txt";
+  }
+
+  delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 }
