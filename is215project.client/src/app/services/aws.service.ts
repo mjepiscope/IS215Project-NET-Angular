@@ -18,34 +18,34 @@ export class AwsService {
     return this.http.get<S3Bucket[]>('/api/aws/getBuckets');
   }
 
-  public generateContentFromImage(file: File): Observable<string> {
+  //public generateContentFromImage(file: File): Observable<string> {
+
+  //  let formData: FormData = new FormData();
+  //  formData.append('file', file);
+
+  //  return this.http.post<string>(
+  //    '/api/aws/generateContentFromImage',
+  //    formData
+  //  );
+
+  //}
+
+  public uploadImage(file: File): Observable<number> {
 
     let formData: FormData = new FormData();
     formData.append('file', file);
 
-    return this.http.post<string>(
-      '/api/aws/generateContentFromImage',
-      formData
-    );
-
-  }
-
-  public uploadImage(file: File): Observable<string> {
-
-    let formData: FormData = new FormData();
-    formData.append('file', file);
-
-    return this.http.post<string>(
+    return this.http.post<number>(
       '/api/aws/uploadImage',
       formData
     );
 
   }
 
-  public getGeneratedContent(filename: string): Observable<string> {
+  public getGeneratedContent(timestamp: number): Observable<string> {
     let params =
       new HttpParams()
-        .append("filename", filename);
+        .append("timestamp", timestamp);
 
     return this.http.get<string>(
       '/api/aws/getGeneratedContent',
