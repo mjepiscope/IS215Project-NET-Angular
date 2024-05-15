@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from "rxjs";
 import { S3Bucket } from '../models/s3-bucket';
-import { Article } from '../models/article';
 
 @Injectable({
   providedIn: 'root'
@@ -31,22 +30,22 @@ export class AwsService {
 
   //}
 
-  public uploadImage(file: File): Observable<Article> {
+  public uploadImage(file: File): Observable<number> {
 
     let formData: FormData = new FormData();
     formData.append('file', file);
 
-    return this.http.post<Article>(
+    return this.http.post<number>(
       '/api/aws/uploadImage',
       formData
     );
 
   }
 
-  public getGeneratedContent(filename: string): Observable<string> {
+  public getGeneratedContent(timestamp: number): Observable<string> {
     let params =
       new HttpParams()
-        .append("filename", filename);
+        .append("timestamp", timestamp);
 
     return this.http.get<string>(
       '/api/aws/getGeneratedContent',

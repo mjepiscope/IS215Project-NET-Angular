@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { firstValueFrom } from 'rxjs';
-import { Article } from './models/article';
 import { AwsService } from './services/aws.service';
 
 @Component({
@@ -31,9 +30,9 @@ export class AppComponent {
 
     this.service.uploadImage(this.file).subscribe({
 
-      next: async (a: Article) => {
+      next: async (timestamp: number) => {
 
-        let expectedFilename = this.getExpectedFilename(a.imageFilename);
+        //let expectedFilename = this.getExpectedFilename(a.imageFilename);
 
         let i = 0;
 
@@ -41,7 +40,7 @@ export class AppComponent {
         while (i < 30) {
 
           try {
-            this.article = await firstValueFrom(this.service.getGeneratedContent(expectedFilename));
+            this.article = await firstValueFrom(this.service.getGeneratedContent(timestamp));
             break;
           }
           catch (e) {
@@ -66,11 +65,11 @@ export class AppComponent {
 
   }
 
-  getExpectedFilename(filenameWithTimestamp: string) {
-    let pos = filenameWithTimestamp.lastIndexOf(".");
+  //getExpectedFilename(filenameWithTimestamp: string) {
+  //  let pos = filenameWithTimestamp.lastIndexOf(".");
 
-    return filenameWithTimestamp.substring(0, pos < 0 ? filenameWithTimestamp.length : pos) + ".txt";
-  }
+  //  return filenameWithTimestamp.substring(0, pos < 0 ? filenameWithTimestamp.length : pos) + ".txt";
+  //}
 
   delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
