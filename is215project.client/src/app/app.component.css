@@ -21,7 +21,7 @@ div.upload, div.article {
   min-width: 400px;
 }
 
-label.custom-file-upload {
+/**label.custom-file-upload {
   font-size: 20px;
   padding: 10px 35px;
   background: #0492c2;
@@ -32,9 +32,9 @@ label.custom-file-upload {
   cursor: pointer;
   text-align: centered;
   text-transform: capitalize;
-}
+}**/
 
-/**
+
 label.custom-file-upload {
   align-items: center;
   border: 2px dashed #ddd;
@@ -48,7 +48,7 @@ label.custom-file-upload {
   transition: border-color 0.3s ease;
   width: 100%;
 }
-**/
+
 
 label.custom-file-upload input[type="file"] {
   display: none;
