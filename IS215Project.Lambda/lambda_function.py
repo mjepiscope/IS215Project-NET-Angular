@@ -127,7 +127,7 @@ def lambda_handler(event, context):
                 generated_text = split_text[1].strip() if len(split_text) > 1 else ""
                 
                 print("Response from OpenAI API:", generated_text)
-                encoded_article = generated_text.encode("utf-8")
+                #encoded_article = generated_text.encode("utf-8")
                 
                 # Update Dynamo DB - Article Item with Article Title and Generated Content
                 updateResponse = table.update_item(
@@ -135,7 +135,7 @@ def lambda_handler(event, context):
                     UpdateExpression="set ArticleTitle=:t, GeneratedContent=:c",
                     ExpressionAttributeValues={
                         ":t": title,
-                        ":c": encoded_article
+                        ":c": generated_text
                     }
                 )
 
