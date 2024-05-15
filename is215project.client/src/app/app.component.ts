@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { firstValueFrom } from 'rxjs';
 import { AwsService } from './services/aws.service';
@@ -14,12 +15,14 @@ export class AppComponent {
   imageSrc!: string;
   article: string = "Generated text here...";
 
-  constructor(private service: AwsService, private spinner: NgxSpinnerService) { }
+  constructor(private service: AwsService, private spinner: NgxSpinnerService, private snack: MatSnackBar) { }
 
   onImageChange(e: any) {
 
     if (!e || !e.target || !e.target.files) {
-      //TODO Show Error
+      //TODO Show Error, use snackbar
+      this.snack.open("File not found!", "close", { duration: 10000 });
+
       return;
     }
 
@@ -35,12 +38,14 @@ export class AppComponent {
         //let expectedFilename = this.getExpectedFilename(a.imageFilename);
 
         let i = 0;
+        let n = false;
 
         // 30 retries
         while (i < 30) {
 
           try {
             this.article = await firstValueFrom(this.service.getGeneratedContent(timestamp));
+            n = true;
             break;
           }
           catch (e) {
@@ -52,13 +57,17 @@ export class AppComponent {
           // wait 2 sec before trying again
           // this.delay(2000);
         }
+        if (!n) {
+          this.snack.open("Cannot generate content!", "close", { duration: 10000 });
+        }
 
         this.spinner.hide();
       }
 
       , error: (e) => {
         this.spinner.hide();
-        console.log(e);
+        this.snack.open("Cannot upload image to S3!", "close", { duration: 10000 });
+
       }
 
     });
