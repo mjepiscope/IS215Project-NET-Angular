@@ -22,7 +22,7 @@ div.upload, div.article {
 }
 
 label.custom-file-upload {
-  font-size: 30px;
+  font-size: 20px;
   padding: 10px 35px;
   background: #0492c2;
   border: none;
@@ -31,6 +31,7 @@ label.custom-file-upload {
   display: inline-block;
   cursor: pointer;
   text-align: centered;
+  text-transform: capitalize;
 }
 
 /**
@@ -62,7 +63,6 @@ label.custom-file-upload:hover {
   outline:none;
   box-shadow: 0 0 3px 2px rgba(4, 146, 194, 0.5);
 }
-
 
 img#preview-image {
   max-width: 100%;
