@@ -16,9 +16,9 @@ div.page-content {
   margin-top: 20px;
 }
 
-div.upload {
+div.upload button {
   flex-grow: 1;
-  min-width: 400px;
+  min-width: 100px;
   /**for btn style**/
  font-size: 30px;
  padding: 10px 35px;
