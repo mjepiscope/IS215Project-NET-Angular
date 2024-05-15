@@ -57,6 +57,9 @@ def lambda_handler(event, context):
             Attributes=['ALL']
         )
         
+        # Convert to string to save to db
+        rekognition_response_str = json.dumps(response_rekognition)
+        
         scanResponse = table.scan(FilterExpression=Attr('ImageFilename').eq(object_key))
         items = scanResponse['Items']
         article = items[0]
@@ -66,7 +69,7 @@ def lambda_handler(event, context):
             Key={"Timestamp": article['Timestamp']},
             UpdateExpression="set RekognitionResponse=:r",
             ExpressionAttributeValues={
-                ":r": response_rekognition
+                ":r": rekognition_response_str
             }
         )
 
@@ -77,13 +80,13 @@ def lambda_handler(event, context):
             'body': 'Error processing image with Rekognition.'
         }
 
-    # Process the Rekognition response
-    if 'FaceDetails' in response:
-        num_faces = len(response['FaceDetails'])
+    # Process the Rekognition response_rekognition
+    if 'FaceDetails' in response_rekognition:
+        num_faces = len(response_rekognition['FaceDetails'])
         #print(f"Detected {num_faces} face(s) in the uploaded image.")
 
         # Extract facial attributes and perform further analysis as needed
-        for face in response['FaceDetails']:
+        for face in response_rekognition['FaceDetails']:
             # Extract facial attributes (e.g., age, gender, emotions)
             age_range_low = face['AgeRange']['Low']
             age_range_high = face['AgeRange']['High']
