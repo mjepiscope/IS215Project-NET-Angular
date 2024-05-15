@@ -44,33 +44,40 @@ def lambda_handler(event, context):
     filename = os.path.splitext(object_key)[0]+".txt"
     filename_title = os.path.splitext(object_key)[0]+"_title.txt"
     filename_rekognition = os.path.splitext(object_key)[0]+"_rekognition.txt"
-    temp_file_path = '/tmp/{}'.format(os.path.basename(object_key))
+    #temp_file_path = '/tmp/{}'.format(os.path.basename(object_key))
 
     # Download the image file from S3
-    try:
-        s3_client.download_file(bucket_name, object_key, temp_file_path)
-    except Exception as e:
-        print(f"Error downloading file from S3: {e}")
-        # Add generated text for error output
-        error_downloading = """There's an error processing your uploaded image. Can you please try uploading again?
-        Make sure to note this project only supports these image extensions (.jpg, .jpeg (JPEG), .png (Portable Network Graphics), .bmp (Bitmap), and .tiff, .tif (Tagged Image File Format))"""
-        s3_output.put_object(
-            Body=error_downloading,
-            Bucket=output_bucket_name,
-            Key=filename
-        )
-        return {
-            'statusCode': 500,
-            'body': 'Error downloading file from S3.'
-        }
+    #try:
+    #    s3_client.download_file(bucket_name, object_key, temp_file_path)
+    #except Exception as e:
+    #    print(f"Error downloading file from S3: {e}")
+    #    # Add generated text for error output
+    #    error_downloading = """There's an error processing your uploaded image. Can you please try uploading again?
+    #    Make sure to note this project only supports these image extensions (.jpg, .jpeg (JPEG), .png (Portable Network Graphics), .bmp (Bitmap), and .tiff, .tif (Tagged Image File Format))"""
+    #    s3_output.put_object(
+    #        Body=error_downloading,
+    #        Bucket=output_bucket_name,
+    #        Key=filename
+    #    )
+    #    return {
+    #        'statusCode': 500,
+    #        'body': 'Error downloading file from S3.'
+    #    }
 
     # Perform facial detection and analysis using Rekognition
     try:
-        with open(temp_file_path, 'rb') as image_file:
-            response = rekognition_client.detect_faces(
-                Image={'Bytes': image_file.read()},
-                Attributes=['ALL']
-            )
+        # with open(temp_file_path, 'rb') as image_file:
+        #     response = rekognition_client.detect_faces(
+        #         Image={'Bytes': image_file.read()},
+        #         Attributes=['ALL']
+        #     )
+
+        # Pass S3 Image File directly to Rekognition
+        response = rekognition_client.detect_faces(
+            Image={'S3Object':{'Bucket':bucket_name,'Name':object_key}},
+            Attributes=['ALL']
+        )
+
         #print(response)
     except Exception as e:
         print(f"Error processing image with Rekognition: {e}")
