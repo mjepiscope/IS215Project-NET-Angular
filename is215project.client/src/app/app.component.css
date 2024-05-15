@@ -16,7 +16,19 @@ div.page-content {
   margin-top: 20px;
 }
 
-div.upload, div.article {
+div.upload {
+  flex-grow: 1;
+  min-width: 400px;
+  /**for btn style**/
+ font-size: 30px;
+ padding: 10px 35px;
+ background: #0492c2;
+ border: none;
+ color: #ffffff;
+ border-radius: 8px;
+}
+
+div.article {
   flex-grow: 1;
   min-width: 400px;
 }
