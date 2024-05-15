@@ -100,6 +100,35 @@ def lambda_handler(event, context):
             Key=filename_rekognition
         )
 
+    
+    # Get Item By Filename from Dynamo DB - Article
+    from boto3.dynamodb.conditions import Attr
+    
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('Article')
+    
+    scanResponse = table.scan(
+        FilterExpression=Attr('ImageFilename').eq(object_key)
+    )
+    
+    # TODO Add Validation if Item/Article is not found in DynamoDB
+
+    items = scanResponse['Items']
+    article = items[0]
+    #print(article)
+
+    # Update Dynamo DB - Article Item with Rekognition Response and OpenAI Generated Content
+    # TODO Do another update after getting OpenAI Response
+    updateResponse = table.update_item(
+        Key={"Timestamp": article['Timestamp']},
+        UpdateExpression="set RekognitionResponse=:r, GeneratedContent=:c",
+        ExpressionAttributeValues={
+            ":r": str(response),
+            ":c": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque placerat nunc nec leo finibus, at porta sapien commodo. Morbi dictum ante velit, quis fringilla urna finibus nec. Ut consectetur congue purus at feugiat. Nulla sed scelerisque elit, quis sagittis massa. Aenean risus turpis, tempor at velit nec, porttitor consectetur est. Mauris sed quam in lectus tempor venenatis. Nam suscipit accumsan ipsum ut ornare. Nunc commodo dui at nisl efficitur interdum. Quisque id tellus ullamcorper, feugiat arcu in, accumsan mauris. Phasellus risus metus, venenatis fringilla velit volutpat, porta lacinia enim. Suspendisse eget lectus ac turpis feugiat lobortis. Ut pulvinar eu purus nec pharetra. Etiam turpis turpis, finibus non tellus eu, molestie consequat ipsum."
+        }
+    )
+    #print(updateResponse)
+        
     # Process the Rekognition response
     if 'FaceDetails' in response:
         num_faces = len(response['FaceDetails'])

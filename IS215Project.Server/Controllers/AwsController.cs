@@ -29,9 +29,10 @@ namespace IS215Project.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadImageAsync([FromForm] IFormFile file)
         {
-            var timestamp = $"{DateTime.UtcNow:yyyyMMddHHmmss}";
+            var timestamp = $"{DateTime.UtcNow:yyyyMMddHHmmssfff}";
             var filename = GetFilenameWithTimestamp(file.FileName, timestamp);
 
+            // TODO retry if the timestamp (Partition key) is duplicate
             if (!await InsertItemToDynamo(timestamp, filename))
             {
                 throw new Exception($"Failed to insert record to DynamoDb - {TableName} table.");
