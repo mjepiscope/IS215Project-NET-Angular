@@ -1,0 +1,17 @@
+@use '@angular/material' as mat;
+@import '@angular/material/theming';
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+$custom-typography: mat-typography-config($font-family: '"DM Sans", sans-serif');
+@include mat-typography-hierarchy($custom-typography);
+@include mat-core();
+
+
+html, body {
+  height: 100%;
+}
+
+* {
+  font-family: "DM Sans", sans-serif;
+  font-feature-settings: "liga";
+}

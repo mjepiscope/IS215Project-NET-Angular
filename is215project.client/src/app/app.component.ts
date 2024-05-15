@@ -20,9 +20,7 @@ export class AppComponent {
   onImageChange(e: any) {
 
     if (!e || !e.target || !e.target.files) {
-      //TODO Show Error, use snackbar
-      this.snack.open("File not found!", "close", { duration: 10000 });
-
+      this.snack.open("File not found!", "Close", { duration: 10000 });
       return;
     }
 
@@ -34,8 +32,6 @@ export class AppComponent {
     this.service.uploadImage(this.file).subscribe({
 
       next: async (timestamp: number) => {
-
-        //let expectedFilename = this.getExpectedFilename(a.imageFilename);
 
         let i = 0;
         let n = false;
@@ -54,11 +50,10 @@ export class AppComponent {
             // Try move waiting time here before trying again
             await this.delay(2000);
           }
-          // wait 2 sec before trying again
-          // this.delay(2000);
         }
+
         if (!n) {
-          this.snack.open("Cannot generate content!", "close", { duration: 10000 });
+          this.snack.open("Cannot generate content!", "Close", { duration: 10000 });
         }
 
         this.spinner.hide();
@@ -66,19 +61,12 @@ export class AppComponent {
 
       , error: (e) => {
         this.spinner.hide();
-        this.snack.open("Cannot upload image to S3!", "close", { duration: 10000 });
-
+        this.snack.open("Cannot upload image to S3!", "Close", { duration: 10000 });
       }
 
     });
 
   }
-
-  //getExpectedFilename(filenameWithTimestamp: string) {
-  //  let pos = filenameWithTimestamp.lastIndexOf(".");
-
-  //  return filenameWithTimestamp.substring(0, pos < 0 ? filenameWithTimestamp.length : pos) + ".txt";
-  //}
 
   delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
