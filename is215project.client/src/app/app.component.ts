@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { firstValueFrom } from 'rxjs';
+import { Article } from './models/article';
 import { AwsService } from './services/aws.service';
 
 @Component({
@@ -30,9 +31,9 @@ export class AppComponent {
 
     this.service.uploadImage(this.file).subscribe({
 
-      next: async (filenameWithTimestamp: string) => {
-        
-        let expectedFilename = this.getExpectedFilename(filenameWithTimestamp);
+      next: async (a: Article) => {
+
+        let expectedFilename = this.getExpectedFilename(a.imageFilename);
 
         let i = 0;
 
