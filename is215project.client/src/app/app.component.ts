@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { firstValueFrom } from 'rxjs';
 import { AwsService } from './services/aws.service';
@@ -14,12 +15,12 @@ export class AppComponent {
   imageSrc!: string;
   article: string = "Generated text here...";
 
-  constructor(private service: AwsService, private spinner: NgxSpinnerService) { }
+  constructor(private service: AwsService, private spinner: NgxSpinnerService, private snack: MatSnackBar) { }
 
   onImageChange(e: any) {
 
     if (!e || !e.target || !e.target.files) {
-      //TODO Show Error
+      this.snack.open("File not found!", "Close", { duration: 10000 });
       return;
     }
 
@@ -32,15 +33,15 @@ export class AppComponent {
 
       next: async (timestamp: number) => {
 
-        //let expectedFilename = this.getExpectedFilename(a.imageFilename);
-
         let i = 0;
+        let n = false;
 
         // 30 retries
         while (i < 30) {
 
           try {
             this.article = await firstValueFrom(this.service.getGeneratedContent(timestamp));
+            n = true;
             break;
           }
           catch (e) {
@@ -49,8 +50,10 @@ export class AppComponent {
             // Try move waiting time here before trying again
             await this.delay(2000);
           }
-          // wait 2 sec before trying again
-          // this.delay(2000);
+        }
+
+        if (!n) {
+          this.snack.open("Cannot generate content!", "Close", { duration: 10000 });
         }
 
         this.spinner.hide();
@@ -58,18 +61,12 @@ export class AppComponent {
 
       , error: (e) => {
         this.spinner.hide();
-        console.log(e);
+        this.snack.open("Cannot upload image to S3!", "Close", { duration: 10000 });
       }
 
     });
 
   }
-
-  //getExpectedFilename(filenameWithTimestamp: string) {
-  //  let pos = filenameWithTimestamp.lastIndexOf(".");
-
-  //  return filenameWithTimestamp.substring(0, pos < 0 ? filenameWithTimestamp.length : pos) + ".txt";
-  //}
 
   delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));

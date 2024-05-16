@@ -1,3 +1,62 @@
+.upload-container {
+  position: relative; /* Set the position to relative */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: #f8f9fa;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center; /* Center the background image */
+}
+
+#preview-image {
+  position: relative;
+  width: auto;
+  height: 60%;
+  background-size: contain; /* Ensure the background image fits within the container */
+  background-repeat: no-repeat;
+  background-position: center; /* Center the background image */
+}
+.floating-text {
+  position: absolute;
+  bottom: 50px; /* Adjust as needed */
+  left: 10px; /* Adjust as needed */
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+}
+.upload-btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+
+.content {
+  padding: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer {
+  background-color: #f8f9fa;
+  padding: 20px 0;
+}
+
+  .footer h5 {
+    margin-bottom: 10px;
+  }
+
+/* Ensure the left part div covers maximum height */
+.col-lg-6.col-md-12 {
+  height: 100vh;
+  padding: 0;
+}
+
+/*--------------------OLD------------------------*/
+
 div.page {
   display: block;
   margin-left: auto;
@@ -31,16 +90,42 @@ label.custom-file-upload {
   flex-direction: column;
   justify-content: center;
   padding: 20px;
-  transition: border-color 0.3s ease;
-  width: 100%;
+  transition: opacity 0.3s ease;
+  background-color: #fff;
+  width: 30%;
 }
-
 label.custom-file-upload:hover {
-  border-color: #aaa;
+  opacity: 0.8; /* Reduce opacity on hover */
 }
 
-label.custom-file-upload input[type="file"] {
-  display: none;
+
+  /**label.custom-file-upload {
+  align-items: center;
+  border: 2px dashed #ddd;
+  border-radius: 10px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  transition: border-color 0.3s ease;
+  width: 30%;
+}**/
+
+
+  label.custom-file-upload input[type="file"] {
+    display: none;
+  }
+
+  label.custom-file-upload:hover {
+    /** border-color: #aaa; **/
+    background-color: #ffd800;
+  }
+
+.custom-file-upload:focus {
+  outline: none;
+  box-shadow: 0 0 3px 2px rgba(4, 146, 194, 0.5);
 }
 
 img#preview-image {
@@ -51,3 +136,12 @@ div.article-title {
   font-size: 32px;
   font-weight: bold;
 }
+
+.ss-copyright {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+
