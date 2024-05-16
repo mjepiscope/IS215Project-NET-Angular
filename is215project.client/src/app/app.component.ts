@@ -56,7 +56,7 @@ export class AppComponent {
             console.log(e);
             i++;
             // Try move waiting time here before trying again
-            await this.delay(2000);
+            await this.delay(250);
           }
         }
 
