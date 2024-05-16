@@ -15,7 +15,7 @@ export class AppComponent {
   imageSrc!: string;
   title: string = " ";
   article: string = " ";
-  rekognition_link: string = " ";
+  rekognition_link: string = "";
 
   constructor(private service: AwsService, private spinner: NgxSpinnerService, private snack: MatSnackBar) { }
 
@@ -45,8 +45,10 @@ export class AppComponent {
             const response = await firstValueFrom(this.service.getGeneratedContent(timestamp));
             this.title = response.title;
             this.article = response.article;
-            //this.rekognition_link = JSON.parse(response.rekognition_link);
-            this.rekognition_link = " ";
+
+            let parsedJson = JSON.parse(response.rekognition_link);
+            this.rekognition_link = JSON.stringify(parsedJson, undefined, 2);
+
             n = true;
             break;
           }
