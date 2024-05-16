@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from "rxjs";
 import { S3Bucket } from '../models/s3-bucket';
+import { GeneratedContent } from '../models/generated-content';
 
 @Injectable({
   providedIn: 'root'
@@ -29,14 +30,18 @@ export class AwsService {
     );
   }
 
-  public getGeneratedContent(timestamp: number): Observable<string> {
+  public getGeneratedContent(timestamp: number): Observable<GeneratedContent> {
     let params =
       new HttpParams()
         .append("timestamp", timestamp);
 
-    return this.http.get<string>(
+    return this.http.get<GeneratedContent>(
       '/api/aws/getGeneratedContent',
       { params }
     );
+  }
+
+  public getS3ObjectUrl(timestamp: number): Observable<string> {
+    return this.http.get<string>(`/api/aws/getS3ObjectUrl?timestamp=${timestamp}`);
   }
 }
