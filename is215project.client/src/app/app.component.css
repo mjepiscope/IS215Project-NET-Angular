@@ -92,14 +92,14 @@ label.custom-file-upload {
   padding: 20px;
   transition: opacity 0.3s ease;
   background-color: #fff;
-  width: 30%;
+  /*width: 30%;*/
 }
 label.custom-file-upload:hover {
   opacity: 0.8; /* Reduce opacity on hover */
 }
 
 
-  /**label.custom-file-upload {
+ /**label.custom-file-upload {
   align-items: center;
   border: 2px dashed #ddd;
   border-radius: 10px;
@@ -119,8 +119,8 @@ label.custom-file-upload:hover {
   }
 
   label.custom-file-upload:hover {
-    /** border-color: #aaa; **/
-    background-color: #ffd800;
+    border-color: #aaa;
+    /*background-color: #ffd800;*/
   }
 
 .custom-file-upload:focus {
