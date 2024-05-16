@@ -35,7 +35,7 @@ namespace IS215Project.Server.Controllers
 
             if (!await IsImageValidAsync(file))
             {
-                response.ErrorMessage = $"Image File {file.FileName} is not valid.";
+                response.ErrorMessage = $"File {file.FileName} is invalid.";
 
                 return new JsonResult(response);
             }
