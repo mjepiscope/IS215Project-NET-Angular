@@ -143,3 +143,16 @@ div.article-title {
   align-items: center;
   padding: 20px;
 }
+
+a {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  column-gap: 5px;
+}
+
+a mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}

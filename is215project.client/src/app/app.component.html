@@ -25,7 +25,10 @@
         <h1 *ngIf="!imageSrc" class="display-4">Automatic Facial Analysis from Images using Amazon Rekognition</h1>
         <h2>{{ title }}</h2>
         <p>{{ article }}</p>
-        <a *ngIf="imageSrc" (click)="openRekognitionLink()">View Rekognition Output</a>
+        <a *ngIf="rekognition_link" (click)="openRekognitionLink()">
+          View Rekognition Output
+          <mat-icon>open_in_new</mat-icon>
+        </a>
       </div>
     </div>
   </div>
