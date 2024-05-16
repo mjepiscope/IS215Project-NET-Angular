@@ -1,6 +1,6 @@
 <!-- Navbar -->
 <nav class="navbar navbar-dark bg-dark">
-  <span class="navbar-brand mb-0 h1">Rekognize.</span>
+  <span class="navbar-brand mb-0 h1">Rekognize</span>
 </nav>
 
 <!-- Main Content -->
@@ -8,8 +8,12 @@
   <div class="row">
     <!-- Left Part -->
     <div class="col-lg-6 col-md-12" id="index-left">
-      <div class="upload-container" id="background-container">
-        <img id="preview-image" alt="" [src]="imageSrc">
+      <div class="upload-container">
+        <label for="upload-image" class="custom-file-upload" *ngIf="!imageSrc">
+          <input type="file" id="upload-image" accept=".jpg, .png, .jpeg, .bmp, .tiff, .tif" (change)="onImageChange($event)">
+          Upload your image here
+        </label>
+        <img id="preview-image" alt="" [src]="imageSrc" *ngIf="imageSrc">
         <div class="floating-text">
           Source: Amazon Rekognition facial analysis demo
         </div>
@@ -18,13 +22,10 @@
     <!-- Right Part -->
     <div class="col-lg-6 col-md-12" id="index-right">
       <div class="content">
-        <label for="upload-image" class="custom-file-upload">
-          <input type="file" id="upload-image" accept=".jpg, .png, .jpeg, .bmp, .tiff, .tif" (change)="onImageChange($event)">
-          Upload your image here
-        </label>
-        <h2>News Article:</h2>
+        <h1 *ngIf="!imageSrc" class="display-4">Automatic Facial Analysis from Images using Amazon Rekognition</h1>
+        <h2>{{ title }}</h2>
         <p>{{ article }}</p>
-        <a href="#" download>Download Link</a>
+        <a *ngIf="imageSrc" (click)="openRekognitionLink()">View Rekognition Output</a>
       </div>
     </div>
   </div>
@@ -36,13 +37,13 @@
     <div class="row">
       <div class="col-md-6 goal">
         <h4>Rekognize</h4>
-        <p style="text-align: justify;">
+        <p>
           The goal of the project is to develop an application that receives an image, uploads it to an AWS S3 Bucket, and triggers an AWS Lambda Function to analyze the faces detected in the image using Amazon Rekognition. Subsequently, ChatGPT will generate a news article about the individual in the image and display this article on a website.
         </p>
       </div>
       <div class="col-md-6 members">
         <h4>Group Members</h4>
-        <ul class="link-list">
+        <ul class="list-unstyled">
           <li>KC Arante</li>
           <li>Jerome Bartolabac</li>
           <li>Michael John Episcope</li>
@@ -59,4 +60,5 @@
     </div>
   </div>
 </footer>
-<!--<ngx-spinner type="timer" [fullScreen]="true"></ngx-spinner>-->
+
+<ngx-spinner type="timer" [fullScreen]="true"></ngx-spinner>
