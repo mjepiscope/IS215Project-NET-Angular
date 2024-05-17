@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { firstValueFrom } from 'rxjs';
@@ -12,6 +12,9 @@ import { UploadImageResponse } from './models/upload-image-response';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+
+  @ViewChild('articleElement', { read: ElementRef })
+  articleElement!: ElementRef<HTMLElement>;
 
   file!: File;
   imageSrc!: string;
@@ -56,7 +59,7 @@ export class AppComponent {
         this.loadingText = "Retrieving content...";
 
         let i = 0;
-        let n = false;
+        let isSuccess = false;
 
         // 30 retries
         while (i < 30) {
@@ -68,15 +71,17 @@ export class AppComponent {
           try {
             let response = await firstValueFrom(this.service.getGeneratedContent(uploadResponse.timestamp));
 
+            isSuccess = true;
+
             this.title = response.title;
             this.article = response.article;
 
             let parsedJson = JSON.parse(response.rekognition_link);
             this.rekognition_link = JSON.stringify(parsedJson, undefined, 2);
 
-            n = true;
-
             this.snack.open("Click image to upload again.", "Close", { duration: 10000 });
+            this.scrollToArticleElement();
+
             break;
           }
           catch (e) {
@@ -86,7 +91,7 @@ export class AppComponent {
           }
         }
 
-        if (!n) {
+        if (!isSuccess) {
           const snackBarRef = this.snack.open("Cannot generate content! Please upload a different photo.", "Close", { duration: 10000 });
           snackBarRef.afterDismissed().subscribe(() => {
             window.location.reload();
@@ -131,16 +136,9 @@ export class AppComponent {
     newWindow?.document.close();
   }
 
- // fetchS3ObjectUrl(timestamp: number) {
- //   this.service.getS3ObjectUrl(timestamp).subscribe({
- //     next: url => {
- //       this.rekognition_link = url;
- //     },
- //     error: error => {
- //       console.error('Error fetching S3 object URL:', error);
- //     }
- //   });
- // }
+  scrollToArticleElement() {
+    this.articleElement.nativeElement.scrollIntoView({ behavior: 'smooth' });
+  }
 
   delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
