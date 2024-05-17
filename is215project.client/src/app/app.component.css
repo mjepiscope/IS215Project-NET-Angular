@@ -12,6 +12,7 @@
 }
 
 #preview-image {
+  cursor: pointer;
   position: relative;
   width: auto;
   height: 60%;
