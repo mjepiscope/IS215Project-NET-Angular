@@ -4,6 +4,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace IS215Project.Server.Controllers
 {
@@ -53,39 +54,21 @@ namespace IS215Project.Server.Controllers
             if (!item.TryGetValue("GeneratedContent", out var gc))
                 throw new ArgumentException("GeneratedContent not yet available in DynamoDB.");
 
-            return new JsonResult(gc.S);
+            string title = item.TryGetValue("ArticleTitle", out var titleValue) ? titleValue.S : "Default Title";
+            string rekog_link = item.TryGetValue("RekognitionResponse", out var rekognitionLinkValue) ? rekognitionLinkValue.S : "Default Link";
+
+            JObject rekognitionJson = JObject.Parse(rekog_link);
+            string jsonAsString = rekognitionJson.ToString();
+            
+            var result = new
+            {
+                title,
+                article = gc.S,
+                rekognition_link = jsonAsString
+            };
+
+            return new JsonResult(result);
         }
-
-        // Refresh the output bucket name
-        //private async Task RefreshBucketAsync(string bucketName)
-        //{
-        //    try
-        //    {
-        //        var request = new ListObjectsV2Request
-        //        {
-        //            BucketName = bucketName,
-        //        };
-
-        //        ListObjectsV2Response response;
-        //        do
-        //        {
-        //            response = await _s3.ListObjectsV2Async(request);
-        //            foreach (S3Object entry in response.S3Objects)
-        //            {
-        //                System.Console.WriteLine($"Object key: {entry.Key}");
-        //            }
-        //            request.ContinuationToken = response.NextContinuationToken;
-        //        } while (response.IsTruncated);
-        //    }
-        //    catch (AmazonS3Exception e)
-        //    {
-        //        System.Console.WriteLine("Error encountered on server. Message:'{0}' when listing objects", e.Message);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        System.Console.WriteLine("Unknown encountered on server. Message:'{0}' when listing objects", e.Message);
-        //    }
-        //}
 
         private async Task UploadImageToS3(IFormFile file, string filename)
         {

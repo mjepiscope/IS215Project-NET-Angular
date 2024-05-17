@@ -13,7 +13,10 @@ export class AppComponent {
 
   file!: File;
   imageSrc!: string;
-  article: string = "Generated text here...";
+  title: string = " ";
+  article: string = " ";
+  rekognition_link: string = "";
+  imageUrl = 'assets/000.png';
 
   constructor(private service: AwsService, private spinner: NgxSpinnerService, private snack: MatSnackBar) { }
 
@@ -40,7 +43,13 @@ export class AppComponent {
         while (i < 30) {
 
           try {
-            this.article = await firstValueFrom(this.service.getGeneratedContent(timestamp));
+            const response = await firstValueFrom(this.service.getGeneratedContent(timestamp));
+            this.title = response.title;
+            this.article = response.article;
+
+            let parsedJson = JSON.parse(response.rekognition_link);
+            this.rekognition_link = JSON.stringify(parsedJson, undefined, 2);
+
             n = true;
             break;
           }
@@ -48,7 +57,7 @@ export class AppComponent {
             console.log(e);
             i++;
             // Try move waiting time here before trying again
-            await this.delay(2000);
+            await this.delay(250);
           }
         }
 
@@ -67,6 +76,40 @@ export class AppComponent {
     });
 
   }
+
+  openRekognitionLink() {
+    const newWindow = window.open('', '_blank');
+    const htmlContent = `
+      <html>
+      <head>
+        <title>Amazon Rekognition Results</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Amazon Rekognition Results</h1>
+        <pre>${this.rekognition_link}</pre>
+      </body>
+      </html>
+    `;
+    newWindow?.document.write(htmlContent);
+    newWindow?.document.close();
+  }
+
+ // fetchS3ObjectUrl(timestamp: number) {
+ //   this.service.getS3ObjectUrl(timestamp).subscribe({
+ //     next: url => {
+ //       this.rekognition_link = url;
+ //     },
+ //     error: error => {
+ //       console.error('Error fetching S3 object URL:', error);
+ //     }
+ //   });
+ // }
 
   delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));

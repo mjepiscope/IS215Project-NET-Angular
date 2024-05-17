@@ -1,39 +1,67 @@
-<div class="page">
+<!-- Navbar -->
+<!--<nav class="navbar navbar-light bg-light">
+  <span class="navbar-brand mb-0 h1">Automatic Facial Analysis from Images using Amazon Rekognition</span>
+</nav>-->
 
-  <div class="page-title">
-    <h1>Automatic Facial Analysis from Images using Amazon Rekognition</h1>
-  </div>
-
-  <!--<div class="test-content">
-    <app-test></app-test>
-    <app-list-buckets></app-list-buckets>
-  </div>-->
-
-  <div class="page-content">
-
-    <div class="upload">
-
-      <label for="upload-image" class="custom-file-upload">
-
-        <input type="file" id="upload-image" accept=".jpg, .png, .jpeg, .bmp, .tiff, .tif" (change)="onImageChange($event)">
-        Upload your image here
-      </label>
-
-      <div class="image-container">
-        <img id="preview-image" alt="" [src]="imageSrc">
+<!-- Main Content -->
+<div class="container-fluid">
+  <div class="row">
+    <!-- Left Part -->
+    <div class="col-lg-6 col-md-12" id="index-left">
+      <div class="upload-container">
+        <label for="upload-image" class="custom-file-upload" *ngIf="!imageSrc">
+          <input type="file" id="upload-image" accept=".jpg, .png, .jpeg, .bmp, .tiff, .tif" (change)="onImageChange($event)">
+          Upload your image here
+        </label>
+        <img id="preview-image" alt="" [src]="imageSrc" *ngIf="imageSrc">
+        <!--<div class="floating-text">
+        Source: Amazon Rekognition facial analysis demo
+         </div>-->
       </div>
-
     </div>
-
-    <div class="article">
-      <!--Removed title - no title needed
-        <div class="article-title">Title here...</div>
-        -->
+    <!-- Right Part -->
+    <div class="col-lg-6 col-md-12" id="index-right">
+      <div class="content">
+        <img *ngIf="!rekognition_link" [src]="imageUrl" class="fit-image">
+        <h2>{{ title }}</h2>
         <p>{{ article }}</p>
+        <a *ngIf="rekognition_link" (click)="openRekognitionLink()">
+          View Rekognition FaceDetails Output
+          <mat-icon>open_in_new</mat-icon>
+        </a>
       </div>
-
     </div>
-
   </div>
+</div>
+
+<!-- Footer -->
+<!--<footer class="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 goal">
+        <h4>Rekognize</h4>
+        <p>
+          The goal of the project is to develop an application that receives an image, uploads it to an AWS S3 Bucket, and triggers an AWS Lambda Function to analyze the faces detected in the image using Amazon Rekognition. Subsequently, ChatGPT will generate a news article about the individual in the image and display this article on a website.
+        </p>
+      </div>
+      <div class="col-md-6 members">
+        <h4>Group Members</h4>
+        <ul class="list-unstyled">
+          <li>KC Arante</li>
+          <li>Jerome Bartolabac</li>
+          <li>Michael John Episcope</li>
+          <li>Lahriz Marie Gison</li>
+          <li>Glenda Jeruela</li>
+          <li>Pauline Alexandrei Anne Pulido</li>
+        </ul>
+      </div>
+      <div class="col-md-12">
+        <div class="ss-copyright">
+          <span>Made in 2024 for UPOU IS215 Advanced Computer Systems</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>-->
 
 <ngx-spinner type="timer" [fullScreen]="true"></ngx-spinner>
