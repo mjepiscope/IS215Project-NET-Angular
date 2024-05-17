@@ -67,7 +67,6 @@ export class AppComponent {
             break;
           }
           catch (e) {
-            console.log(e);
             i++;
             // Try move waiting time here before trying again
             await this.delay(250);
