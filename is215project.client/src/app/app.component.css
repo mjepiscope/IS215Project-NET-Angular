@@ -9,6 +9,7 @@
   background-size: cover;
   background-position: center; /* Center the background image */
   overflow: hidden;
+  padding: 5px;
 }
 
 #preview-image {
@@ -19,6 +20,7 @@
   background-size: contain; /* Ensure the background image fits within the container */
   background-repeat: no-repeat;
   background-position: center; /* Center the background image */
+  border-radius: 3px;
 }
 
 .floating-text {
@@ -176,4 +178,8 @@ a mat-icon {
 
 body {
   overflow: hidden;
+}
+
+p.loading-text {
+  color: #FFFFFF;
 }
