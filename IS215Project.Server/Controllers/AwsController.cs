@@ -1,10 +1,12 @@
-﻿using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using IS215Project.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using SixLabors.ImageSharp;
 
 namespace IS215Project.Server.Controllers
 {
@@ -30,18 +32,35 @@ namespace IS215Project.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadImageAsync([FromForm] IFormFile file)
         {
-            var timestamp = $"{DateTime.UtcNow:yyyyMMddHHmmssfff}";
-            var filename = GetFilenameWithTimestamp(file.FileName, timestamp);
+            var response = new UploadImageResponse { IsSuccess = false };
 
-            // TODO retry if the timestamp (Partition key) is duplicate
-            if (!await InsertItemToDynamo(timestamp, filename))
+            if (!await IsImageValidAsync(file))
             {
-                throw new Exception($"Failed to insert record to DynamoDb - {TableName} table.");
+                response.ErrorMessage = $"File {file.FileName} is invalid.";
+
+                return new JsonResult(response);
             }
 
-            await UploadImageToS3(file, filename);
+            response.Timestamp = $"{DateTime.UtcNow:yyyyMMddHHmmssfff}";
+            response.ImageFilename = GetFilenameWithTimestamp(file.FileName, response.Timestamp);
 
-            return new JsonResult(timestamp);
+            if (!await InsertItemToDynamo(response.Timestamp, response.ImageFilename))
+            {
+                response.ErrorMessage = "Failed to insert item to DynamoDB.";
+                
+                return new JsonResult(response);
+            }
+
+            if (!await UploadImageToS3(file, response.ImageFilename))
+            {
+                response.ErrorMessage = "Failed to upload image to S3 Bucket.";
+
+                return new JsonResult(response);
+            }
+
+            response.IsSuccess = true;
+
+            return new JsonResult(response);
         }
 
         [HttpGet]
@@ -70,37 +89,51 @@ namespace IS215Project.Server.Controllers
             return new JsonResult(result);
         }
 
-        private async Task UploadImageToS3(IFormFile file, string filename)
+        private async Task<bool> UploadImageToS3(IFormFile file, string filename)
         {
-            // 1. Call S3 to Upload Image
             using var transfer = new TransferUtility(_s3);
-
             await using var stream = file.OpenReadStream();
 
-            await transfer.UploadAsync(
-                stream,
-                GetInputBucketName(),
-                filename
-            );
+            try
+            {
+                await transfer.UploadAsync(stream, GetBucketName(),filename);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+
+                return false;
+            }
         }
 
         private async Task<bool> InsertItemToDynamo(string timestamp, string imageFilename)
         {
-            var item = new Dictionary<string, AttributeValue>
+            try
             {
-                ["Timestamp"] = new AttributeValue() { N = timestamp },
-                ["ImageFilename"] = new AttributeValue() { S = imageFilename },
-            };
+                var item = new Dictionary<string, AttributeValue>
+                {
+                    ["Timestamp"] = new AttributeValue() { N = timestamp },
+                    ["ImageFilename"] = new AttributeValue() { S = imageFilename },
+                };
 
-            var request = new PutItemRequest
+                var request = new PutItemRequest
+                {
+                    TableName = TableName,
+                    Item = item,
+                };
+
+                var response = await _dynamo.PutItemAsync(request);
+
+                return response.HttpStatusCode == System.Net.HttpStatusCode.OK;
+            }
+            catch (Exception ex)
             {
-                TableName = TableName,
-                Item = item,
-            };
+                Console.WriteLine(ex);
 
-            var response = await _dynamo.PutItemAsync(request);
-
-            return response.HttpStatusCode == System.Net.HttpStatusCode.OK;
+                return false;
+            }
         }
 
         private async Task<Dictionary<string, AttributeValue>> GetItemFromDynamo(long timestamp)
@@ -121,27 +154,34 @@ namespace IS215Project.Server.Controllers
             return response.Item;
         }
 
-        private string GetInputBucketName()
+        private async Task<bool> IsImageValidAsync(IFormFile file)
+        {
+            await using var stream = file.OpenReadStream();
+
+            try
+            {
+                await Image.IdentifyAsync(stream);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+
+                return false;
+            }
+        }
+
+        private string GetBucketName()
         {
             // Get bucket name from appsettings.json
-            var bucketName = config.GetValue<string>("AwsContext:S3BucketInputName");
+            var bucketName = config.GetValue<string>("AwsContext:S3BucketName");
 
             if (string.IsNullOrEmpty(bucketName))
-                throw new ArgumentNullException(nameof(bucketName), "AwsContext:S3BucketInputName is null or invalid.");
+                throw new ArgumentNullException(nameof(bucketName), "AwsContext:S3BucketName is null or invalid.");
 
             return bucketName;
         }
-
-        //private string GetOutputBucketName()
-        //{
-        //    // Get bucket name from appsettings.json
-        //    var bucketName = config.GetValue<string>("AwsContext:S3BucketOutputName");
-
-        //    if (string.IsNullOrEmpty(bucketName))
-        //        throw new ArgumentNullException(nameof(bucketName), "AwsContext:S3BucketOutputName is null or invalid.");
-
-        //    return bucketName;
-        //}
 
         private string GetFilenameWithTimestamp(string filename, string timestamp)
         {
@@ -151,12 +191,5 @@ namespace IS215Project.Server.Controllers
 
             return $"{baseName}.{timestamp}{ext}";
         }
-
-        //private string GetExpectedOutputFilename(string filenameWithTimestamp)
-        //{
-        //    // Return expected output filename
-        //    var pos = filenameWithTimestamp.LastIndexOf(".");
-        //    return filenameWithTimestamp.Substring(0, pos < 0 ? filenameWithTimestamp.Length : pos) + ".txt";
-        //}
     }
 }
