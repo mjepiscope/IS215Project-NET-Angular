@@ -17,6 +17,7 @@ namespace IS215Project.Server.Controllers
         private readonly IAmazonS3 _s3 = new AmazonS3Client();
         private readonly IAmazonDynamoDB _dynamo = new AmazonDynamoDBClient();
         private const string TableName = "Article";
+        private const long ImageMaxSize = 1024 * 1024 * 15;
 
         [HttpGet]
         public bool TestConnection() => true;
@@ -33,6 +34,14 @@ namespace IS215Project.Server.Controllers
         public async Task<IActionResult> UploadImageAsync([FromForm] IFormFile file)
         {
             var response = new UploadImageResponse { IsSuccess = false };
+
+            //https://docs.aws.amazon.com/rekognition/latest/dg/limits.html
+            if (file.Length >= ImageMaxSize)
+            {
+                response.ErrorMessage = "File must be 15 MB or less.";
+
+                return new JsonResult(response);
+            }
 
             if (!await IsImageValidAsync(file))
             {

@@ -79,7 +79,7 @@ export class AppComponent {
             let parsedJson = JSON.parse(response.rekognition_link);
             this.rekognition_link = JSON.stringify(parsedJson, undefined, 2);
 
-            this.snack.open("Click image to upload again.", "Close", { duration: 10000 });
+            this.snack.open("Facial analysis from uploaded image was generated successfully. Click image field to upload new image.", "Close", { duration: 10000 });
             this.scrollToArticleElement();
 
             break;
