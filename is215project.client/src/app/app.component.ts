@@ -18,6 +18,7 @@ export class AppComponent {
   title: string = " ";
   article: string = " ";
   rekognition_link: string = "";
+  loadingText: string = "";
   imageUrl = 'assets/000.png';
 
   constructor(private service: AwsService, private spinner: NgxSpinnerService, private snack: MatSnackBar) { }
@@ -31,11 +32,16 @@ export class AppComponent {
 
     this.file = e.target.files[0];
 
+    this.loadingText = "Uploading image...";
     this.spinner.show();
 
     this.service.uploadImage(this.file).subscribe({
 
       next: async (uploadResponse: UploadImageResponse) => {
+
+        this.title = "";
+        this.article = "";
+        this.rekognition_link = ""
 
         if (!uploadResponse.isSuccess) {
           let errorMessage = uploadResponse.errorMessage ?? "Cannot upload image to S3!";
@@ -47,12 +53,17 @@ export class AppComponent {
 
         // Show preview only when the image has been uploaded
         this.imageSrc = URL.createObjectURL(this.file);
+        this.loadingText = "Retrieving content...";
 
         let i = 0;
         let n = false;
 
         // 30 retries
         while (i < 30) {
+
+          if (i > 10) {
+            this.loadingText = "Please wait...";
+          }
 
           try {
             let response = await firstValueFrom(this.service.getGeneratedContent(uploadResponse.timestamp));
