@@ -18,6 +18,7 @@
   background-size: contain; /* Ensure the background image fits within the container */
   background-repeat: no-repeat;
   background-position: center; /* Center the background image */
+  cursor: pointer;
 }
 
 .floating-text {
@@ -149,14 +150,14 @@ a mat-icon {
   line-height: 2.0;
   padding: 30px;
   text-align: justify;
-  margin-top: 20px;
+  margin-top: -15px;
 }
 
 /*Title*/
 #index-right .content h2 {
   padding: 30px; 
   text-align: justify;
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 /*Link*/

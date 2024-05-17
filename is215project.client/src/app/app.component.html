@@ -10,13 +10,15 @@
     <div class="col-lg-6 col-md-12" id="index-left">
       <div class="upload-container">
         <label for="upload-image" class="custom-file-upload" *ngIf="!imageSrc">
+          <!-- <input type="file" id="upload-image" #updateImage accept=".jpg, .png, .jpeg, .bmp, .tiff, .tif" (change)="onImageChange($event)">-->
           <input type="file" id="upload-image" accept=".jpg, .png, .jpeg, .bmp, .tiff, .tif" (change)="onImageChange($event)">
           Upload your image here
         </label>
         <img id="preview-image" alt="" [src]="imageSrc" *ngIf="imageSrc">
+        <!--<img id="preview-image" alt="" [src]="imageSrc" *ngIf="imageSrc" (click)="updateImage.click()">-->
         <!--<div class="floating-text">
-        Source: Amazon Rekognition facial analysis demo
-         </div>-->
+             Source: Amazon Rekognition facial analysis demo
+        </div>-->
       </div>
     </div>
     <!-- Right Part -->
