@@ -18,6 +18,7 @@ export class AppComponent {
   title: string = " ";
   article: string = " ";
   rekognition_link: string = "";
+  imageUrl = 'assets/000.png';
 
   constructor(private service: AwsService, private spinner: NgxSpinnerService, private snack: MatSnackBar) { }
 
@@ -54,7 +55,8 @@ export class AppComponent {
         while (i < 30) {
 
           try {
-            const response = await firstValueFrom(this.service.getGeneratedContent(uploadResponse.timestamp));
+            let response = await firstValueFrom(this.service.getGeneratedContent(uploadResponse.timestamp));
+
             this.title = response.title;
             this.article = response.article;
 
@@ -68,7 +70,7 @@ export class AppComponent {
             console.log(e);
             i++;
             // Try move waiting time here before trying again
-            await this.delay(2000);
+            await this.delay(250);
           }
         }
 
