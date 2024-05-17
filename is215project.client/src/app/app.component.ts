@@ -74,7 +74,11 @@ export class AppComponent {
         }
 
         if (!n) {
-          this.snack.open("Cannot generate content!", "Close", { duration: 10000 });
+          this.spinner.hide();
+          const snackBarRef = this.snack.open("Cannot generate content! Please upload a different photo.", "Close", { duration: 10000 });
+          snackBarRef.afterDismissed().subscribe(() => {
+            window.location.reload();
+          });
         }
 
         this.spinner.hide();
@@ -82,7 +86,10 @@ export class AppComponent {
 
       , error: (e) => {
         this.spinner.hide();
-        this.snack.open("Cannot upload image to S3!", "Close", { duration: 10000 });
+        const snackBarRef = this.snack.open("Cannot upload image to S3! Try again!", "Close", { duration: 10000 });
+        snackBarRef.afterDismissed().subscribe(() => {
+          window.location.reload();
+        });
       }
 
     });
