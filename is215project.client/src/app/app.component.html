@@ -14,19 +14,19 @@
           Upload your image here
         </label>
         <img id="preview-image" alt="" [src]="imageSrc" *ngIf="imageSrc">
-        <div class="floating-text">
-          Source: Amazon Rekognition facial analysis demo
-        </div>
+        <!--<div class="floating-text">
+        Source: Amazon Rekognition facial analysis demo
+         </div>-->
       </div>
     </div>
     <!-- Right Part -->
     <div class="col-lg-6 col-md-12" id="index-right">
       <div class="content">
-        <h1 *ngIf="!imageSrc" class="display-4">Automatic Facial Analysis from Images using Amazon Rekognition</h1>
+        <img *ngIf="!rekognition_link" [src]="imageUrl" class="fit-image">
         <h2>{{ title }}</h2>
         <p>{{ article }}</p>
         <a *ngIf="rekognition_link" (click)="openRekognitionLink()">
-          View Rekognition Output
+          View Rekognition FaceDetails Output
           <mat-icon>open_in_new</mat-icon>
         </a>
       </div>

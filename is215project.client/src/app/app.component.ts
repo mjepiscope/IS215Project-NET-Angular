@@ -16,6 +16,7 @@ export class AppComponent {
   title: string = " ";
   article: string = " ";
   rekognition_link: string = "";
+  imageUrl = 'assets/000.png';
 
   constructor(private service: AwsService, private spinner: NgxSpinnerService, private snack: MatSnackBar) { }
 
