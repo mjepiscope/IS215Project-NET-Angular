@@ -1,10 +1,12 @@
-﻿using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using IS215Project.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using SixLabors.ImageSharp;
 
 namespace IS215Project.Server.Controllers
 {
@@ -30,18 +32,35 @@ namespace IS215Project.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadImageAsync([FromForm] IFormFile file)
         {
-            var timestamp = $"{DateTime.UtcNow:yyyyMMddHHmmssfff}";
-            var filename = GetFilenameWithTimestamp(file.FileName, timestamp);
+            var response = new UploadImageResponse { IsSuccess = false };
 
-            // TODO retry if the timestamp (Partition key) is duplicate
-            if (!await InsertItemToDynamo(timestamp, filename))
+            if (!await IsImageValidAsync(file))
             {
-                throw new Exception($"Failed to insert record to DynamoDb - {TableName} table.");
+                response.ErrorMessage = $"File {file.FileName} is invalid.";
+
+                return new JsonResult(response);
             }
 
-            await UploadImageToS3(file, filename);
+            response.Timestamp = $"{DateTime.UtcNow:yyyyMMddHHmmssfff}";
+            response.ImageFilename = GetFilenameWithTimestamp(file.FileName, response.Timestamp);
 
-            return new JsonResult(timestamp);
+            if (!await InsertItemToDynamo(response.Timestamp, response.ImageFilename))
+            {
+                response.ErrorMessage = "Failed to insert item to DynamoDB.";
+                
+                return new JsonResult(response);
+            }
+
+            if (!await UploadImageToS3(file, response.ImageFilename))
+            {
+                response.ErrorMessage = "Failed to upload image to S3 Bucket.";
+
+                return new JsonResult(response);
+            }
+
+            response.IsSuccess = true;
+
+            return new JsonResult(response);
         }
 
         [HttpGet]
@@ -49,6 +68,7 @@ namespace IS215Project.Server.Controllers
         {
             //https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.html
             var item = await GetItemFromDynamo(timestamp);
+																		  
 
             //https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_GetItem.html#API_GetItem_ResponseSyntax
             if (!item.TryGetValue("GeneratedContent", out var gc))
@@ -59,6 +79,7 @@ namespace IS215Project.Server.Controllers
 
             JObject rekognitionJson = JObject.Parse(rekog_link);
             string jsonAsString = rekognitionJson.ToString();
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									   
             
             var result = new
             {
@@ -70,18 +91,24 @@ namespace IS215Project.Server.Controllers
             return new JsonResult(result);
         }
 
-        private async Task UploadImageToS3(IFormFile file, string filename)
+        private async Task<bool> UploadImageToS3(IFormFile file, string filename)
         {
             // 1. Call S3 to Upload Image
             using var transfer = new TransferUtility(_s3);
-
             await using var stream = file.OpenReadStream();
 
-            await transfer.UploadAsync(
-                stream,
-                GetInputBucketName(),
-                filename
-            );
+            try
+            {
+                await transfer.UploadAsync(stream, GetInputBucketName(),filename);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+
+                return false;
+            }
         }
 
         private async Task<bool> InsertItemToDynamo(string timestamp, string imageFilename)
@@ -119,6 +146,22 @@ namespace IS215Project.Server.Controllers
             var response = await _dynamo.GetItemAsync(request);
 
             return response.Item;
+        }
+
+        private async Task<bool> IsImageValidAsync(IFormFile file)
+        {
+            await using var stream = file.OpenReadStream();
+
+            try
+            {
+                var imageInfo = await Image.IdentifyAsync(stream);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         private string GetInputBucketName()

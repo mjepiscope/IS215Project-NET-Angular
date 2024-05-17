@@ -2,7 +2,9 @@ import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { firstValueFrom } from 'rxjs';
+
 import { AwsService } from './services/aws.service';
+import { UploadImageResponse } from './models/upload-image-response';
 
 @Component({
   selector: 'app-root',
@@ -28,13 +30,23 @@ export class AppComponent {
     }
 
     this.file = e.target.files[0];
-    this.imageSrc = URL.createObjectURL(this.file);
 
     this.spinner.show();
 
     this.service.uploadImage(this.file).subscribe({
 
-      next: async (timestamp: number) => {
+      next: async (uploadResponse: UploadImageResponse) => {
+
+        if (!uploadResponse.isSuccess) {
+          let errorMessage = uploadResponse.errorMessage ?? "Cannot upload image to S3!";
+          this.snack.open(errorMessage, "Close", { duration: 10000 });
+          this.spinner.hide();
+
+          return;
+        }
+
+        // Show preview only when the image has been uploaded
+        this.imageSrc = URL.createObjectURL(this.file);
 
         let i = 0;
         let n = false;
@@ -43,7 +55,8 @@ export class AppComponent {
         while (i < 30) {
 
           try {
-            const response = await firstValueFrom(this.service.getGeneratedContent(timestamp));
+            let response = await firstValueFrom(this.service.getGeneratedContent(uploadResponse.timestamp));
+
             this.title = response.title;
             this.article = response.article;
 
