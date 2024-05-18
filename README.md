@@ -12,7 +12,7 @@ This project, Automatic Facial Analysis from Images using Amazon Rekognition, de
   5. Automatic News Generation: Using the Rekognition output, ChatGPT generates a news article about the individual(s) in the image.
   6. Web Presentation: The generated news article is displayed on a web page.
 
-![image](https://github.com/mjepiscope/IS215Project-NET-Angular/assets/13115232/45ccc3eb-0292-410d-9355-57e969c89203)
+![image](https://github.com/mjepiscope/IS215Project-NET-Angular/assets/13115232/9c0d1bf9-19a0-4e7e-91a9-fb3b62cfe5cd)
 
 ## **Project Flow**
 
@@ -32,8 +32,8 @@ This project, Automatic Facial Analysis from Images using Amazon Rekognition, de
        - The article is retrieved and displayed on a web page.
          
 ## **Detailed Flowchart**
+![image](https://github.com/mjepiscope/IS215Project-NET-Angular/assets/13115232/6e917014-4839-44bb-9268-e0502d25cb84)
 
-![image](https://github.com/mjepiscope/IS215Project-NET-Angular/assets/13115232/74d8531d-8a37-4add-bd1b-12e3f90365b4)
 
 ## **Usage**
 	1. Visit the web application URL.
